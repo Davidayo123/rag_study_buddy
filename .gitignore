@@ -1,0 +1,19 @@
+# Environment variables (API keys)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+
+# Chroma vector database
+chroma_db/
+
+# Temp files from PDF uploads
+temp_*.pdf
+
+# IDE
+.vscode/
+.idea/
