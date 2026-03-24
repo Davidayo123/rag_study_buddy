@@ -65,7 +65,7 @@ async function sendMessage() {
     showLoadingMessage();
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/ask', {
+        const response = await fetch('/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: question })
@@ -108,7 +108,7 @@ pdfUpload.addEventListener('change', async (e) => {
     formData.append('file', file);
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/upload', {
+        const response = await fetch('/upload', {
             method: 'POST',
             body: formData
         });
