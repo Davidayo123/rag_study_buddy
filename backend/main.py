@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import shutil
@@ -71,10 +72,6 @@ print("AI Engine Online!")
 
 class QuestionRequest(BaseModel):
     question: str
-    
-@app.get("/")
-def read_root():
-    return {"message": "Dynamic Study Buddy API is running!"}
 
 @app.post("/ask")
 def ask_tutor(request: QuestionRequest):
@@ -114,3 +111,8 @@ async def upload_pdf(file: UploadFile = File(...)):
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
         raise HTTPException(status_code=500, detail=f"Failed to process PDF: {str(e)}")
+
+# --- DIRECTORY MOUNT FOR FRONTEND ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
