@@ -10,16 +10,19 @@ import chromadb
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
+# Resolve paths relative to this file's directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Load the secret API key
-load_dotenv()
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 if not os.getenv("GROQ_API_KEY"):
-    raise ValueError("GROQ_API_KEY is missing! Please add it to your .env file.")
+    raise ValueError("GROQ_API_KEY is missing! Please add it to your .env file or set it in Render's environment variables.")
 
 app = FastAPI(title="Dynamic Study Buddy API")
 
@@ -33,8 +36,8 @@ app.add_middleware(
 
 print("Waking up the AI Engine...")
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
+embeddings = FastEmbedEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+chroma_client = chromadb.PersistentClient(path=os.path.join(BASE_DIR, "chroma_db"))
 vector_db = Chroma(client=chroma_client, embedding_function=embeddings)
 retriever = vector_db.as_retriever(search_kwargs={"k": 3})
 
@@ -113,6 +116,5 @@ async def upload_pdf(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Failed to process PDF: {str(e)}")
 
 # --- DIRECTORY MOUNT FOR FRONTEND ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
