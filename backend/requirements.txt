@@ -8,7 +8,6 @@ langchain
 langchain-groq
 langchain-community
 langchain-core
-langchain-huggingface
 langchain-text-splitters
+fastembed
 chromadb
-sentence-transformers
